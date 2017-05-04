@@ -4,33 +4,41 @@ var React = require('react'),
     createSideEffect = require('react-side-effect');
 
 var _serverStatus = 200;
+var _serverLocation = null;
 
-function getStatusFromPropsList(propsList) {
+function getCurrentPropsFromPropsList(propsList) {
   var innermostProps = propsList[propsList.length - 1];
-  if (innermostProps) {
-    return innermostProps.code;
-  }
+  return innermostProps || {};
 }
 
 var NestedStatus = createSideEffect(function handleChange(propsList) {
-  var status = getStatusFromPropsList(propsList);
-  _serverStatus = status || 200;
+  var props = getCurrentPropsFromPropsList(propsList);
+  _serverStatus = props.code || 200;
+  _serverLocation = props.location || '';
 }, {
   displayName: 'NestedStatus',
 
   propTypes: {
-    code: React.PropTypes.number.isRequired
+    code: React.PropTypes.number.isRequired,
+    location: React.PropTypes.string
   },
 
   statics: {
     peek: function () {
-      return _serverStatus;
+      return {
+        code: _serverStatus,
+        location: _serverLocation
+      };
     },
 
     rewind: function () {
       var status = _serverStatus;
+      var location = _serverLocation;
       this.dispose();
-      return status;
+      return {
+        code: status,
+        location: location
+      };
     }
   }
 });

@@ -85,7 +85,7 @@ var html = React.renderToStaticMarkup(htmlComponent({
 }));
 
 // Express
-res.status(status).send('<!DOCTYPE html>' + html);
+res.status(status.code).send('<!DOCTYPE html>' + html);
 ```
 
 ## Thank you

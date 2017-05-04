@@ -81,9 +81,9 @@ describe('NestedStatus.rewind', function () {
         React.createElement(NestedStatus, {code: 202}, React.createElement(NestedStatus, {code: 203}))
       )
     );
-    expect(NestedStatus.peek()).to.equal(203);
+    expect(NestedStatus.peek().code).to.equal(203);
     NestedStatus.rewind();
-    expect(NestedStatus.peek()).to.equal(200);
+    expect(NestedStatus.peek().code).to.equal(200);
   });
   it('returns the latest status code', function () {
     var code = 200;
@@ -92,15 +92,24 @@ describe('NestedStatus.rewind', function () {
         React.createElement(NestedStatus, {code: 500}, React.createElement(NestedStatus, {code: code}))
       )
     );
-    expect(NestedStatus.rewind()).to.equal(code);
+    expect(NestedStatus.rewind().code).to.equal(code);
   });
-  it('returns 200 if no mounted instances exist', function () {
+  it('returns location for 301', function () {
     React.renderToStaticMarkup(
-      React.createElement(NestedStatus, {code: 500},
-        React.createElement(NestedStatus, {code: 404}, React.createElement(NestedStatus, {code: 301}))
+      React.createElement(NestedStatus, {code: 301, location: 'https://test.com'})
+    );
+    const status = NestedStatus.rewind();
+    expect(status.code).to.equal(301);
+    expect(status.location).to.equal('https://test.com');
+  });
+  it('returns location for 302', function () {
+    React.renderToStaticMarkup(
+      React.createElement(NestedStatus, {code: 301, location: 'https://test.com'},
+        React.createElement(NestedStatus, {code: 302, location: 'https://test2.com'})
       )
     );
-    NestedStatus.rewind();
-    expect(NestedStatus.peek()).to.equal(200);
+    const status = NestedStatus.rewind();
+    expect(status.code).to.equal(302);
+    expect(status.location).to.equal('https://test2.com');
   });
 });
